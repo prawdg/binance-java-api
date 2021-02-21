@@ -9,17 +9,7 @@ binance-java-api is a lightweight Java library for interacting with the [Binance
 * Support for User Data, Trade, Kline, and Depth event streaming using [Binance WebSocket API](https://www.binance.com/restapipub.html#wss-endpoint).
 
 ## Installation
-1. Install library into your Maven's local repository by running `mvn install`
-2. Add the following Maven dependency to your project's `pom.xml`:
-```
-<dependency>
-  <groupId>com.binance.api</groupId>
-  <artifactId>binance-api-client</artifactId>
-  <version>1.0.0</version>
-</dependency>
-```
-
-Alternatively, you can clone this repository and run the [examples](https://github.com/joaopsilva/binance-java-api/tree/master/src/test/java/com/binance/api/examples).
+Clone this library and ``mvn install``
 
 ## Examples
 

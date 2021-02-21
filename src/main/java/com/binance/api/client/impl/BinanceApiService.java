@@ -47,7 +47,7 @@ public interface BinanceApiService {
   @GET("/api/v1/depth")
   Call<OrderBook> getOrderBook(@Query("symbol") String symbol, @Query("limit") Integer limit);
 
-  @GET("/api/v1/aggTrades")
+  @GET("/api/v3/aggTrades")
   Call<List<AggTrade>> getAggTrades(@Query("symbol") String symbol, @Query("fromId") String fromId, @Query("limit") Integer limit,
                                     @Query("startTime") Long startTime, @Query("endTime") Long endTime);
 

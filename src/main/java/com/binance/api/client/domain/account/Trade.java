@@ -10,6 +10,11 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class Trade {
 
   /**
+   * Symbol.
+   */
+  private String symbol;
+  
+  /**
    * Trade id.
    */
   private Long id;
@@ -23,6 +28,11 @@ public class Trade {
    * Quantity.
    */
   private String qty;
+  
+  /**
+   * Quantity quoted.
+   */
+  private String quoteQty;
 
   /**
    * Commission.
@@ -49,6 +59,16 @@ public class Trade {
   private boolean bestMatch;
 
   private String orderId;
+  
+  private String orderListId;
+  
+  public String getSymbol() {
+	  return symbol;
+  }
+  
+  public void setSymbol(String symbol) {
+	  this.symbol = symbol;
+  }
 
   public Long getId() {
     return id;
@@ -72,6 +92,14 @@ public class Trade {
 
   public void setQty(String qty) {
     this.qty = qty;
+  }
+  
+  public String getQuoteQty() {
+    return quoteQty;
+  }
+
+  public void setQuoteQty(String quoteQty) {
+    this.quoteQty = quoteQty;
   }
 
   public String getCommission() {
@@ -129,6 +157,14 @@ public class Trade {
   public void setOrderId(String orderId) {
     this.orderId = orderId;
   }
+  
+  public String getOrderListId() {
+    return orderListId;
+  }
+
+  public void setOrderListId(String orderListId) {
+    this.orderListId = orderListId;
+  }
 
   @Override
   public String toString() {
@@ -143,6 +179,7 @@ public class Trade {
         .append("maker", maker)
         .append("bestMatch", bestMatch)
         .append("orderId", orderId)
+        .append('\n')
         .toString();
   }
 }
