@@ -1,4 +1,4 @@
-package com.binance.api.examples;
+package com.binance.trader.strategy;
 
 import org.ta4j.core.BarSeries;
 import org.ta4j.core.BarSeriesManager;
@@ -18,7 +18,7 @@ import org.ta4j.core.trading.rules.OverIndicatorRule;
 import org.ta4j.core.trading.rules.UnderIndicatorRule;
 
 import com.binance.api.client.domain.market.CandlestickInterval;
-import com.binance.trader.BinanceBarLoader;
+import com.binance.trader.util.BinanceBarLoader;
 
 /**
  * Moving momentum strategy.
@@ -57,18 +57,14 @@ public class MACDStrategy {
 		EMAIndicator emaMacd = new EMAIndicator(macd, 9);
 
 		// Entry rule
-		Rule entryRule = new OverIndicatorRule(shortEma, longEma) // Trend
-				// .and(new CrossedDownIndicatorRule(stochasticOscillK, 20)) //
-				// Signal
-				// // 1
-				.and(new OverIndicatorRule(macd, emaMacd)); // Signal 2
+		Rule entryRule = new OverIndicatorRule(shortEma, longEma)
+				// .and(new CrossedDownIndicatorRule(stochasticOscillK, 20))
+				.and(new OverIndicatorRule(macd, emaMacd));
 
 		// Exit rule
-		Rule exitRule = new UnderIndicatorRule(shortEma, longEma) // Trend
-				// .and(new CrossedUpIndicatorRule(stochasticOscillK, 20)) //
-				// Signal
-				// // 1
-				.and(new UnderIndicatorRule(macd, emaMacd)); // Signal 2
+		Rule exitRule = new UnderIndicatorRule(shortEma, longEma)
+				// .and(new CrossedUpIndicatorRule(stochasticOscillK, 20))
+				.and(new UnderIndicatorRule(macd, emaMacd));
 
 		return new BaseStrategy(entryRule, exitRule);
 	}
@@ -76,8 +72,8 @@ public class MACDStrategy {
 	public static void main(String[] args) {
 
 		// Getting the bar series
-		BarSeries series = BinanceBarLoader.loadBars("ICXBUSD",
-				CandlestickInterval.HALF_HOURLY);
+		BarSeries series = BinanceBarLoader.loadBars("COMPBUSD",
+				CandlestickInterval.HOURLY);
 
 		// Building the trading strategy
 		Strategy strategy = buildStrategy(series);
@@ -85,7 +81,7 @@ public class MACDStrategy {
 		// Running the strategy
 		BarSeriesManager seriesManager = new BarSeriesManager(series);
 		TradingRecord tradingRecord = seriesManager.run(strategy, OrderType.BUY,
-				series.numOf(700));
+				series.numOf(1), 36, series.getEndIndex());
 		evaluateRecord(series, tradingRecord);
 	}
 
@@ -95,7 +91,13 @@ public class MACDStrategy {
 		for (int i = 0; i < tradingRecord.getTradeCount(); i++) {
 			Trade trade = tradingRecord.getTrades().get(i);
 			profit = profit.plus(trade.getProfit());
-			System.out.println(trade.getProfit());
+			System.out.printf(
+					"Buy@ %.2f [%s]\tSell@ %.2f [%s]\t Profit: %.2f\n",
+					trade.getEntry().getNetPrice().doubleValue(),
+					series.getBar(trade.getEntry().getIndex()).getDateName(),
+					trade.getExit().getNetPrice().doubleValue(),
+					series.getBar(trade.getExit().getIndex()).getDateName(),
+					trade.getProfit().doubleValue());
 		}
 		System.out.println("Profit: " + profit);
 		System.out.println("Number of trades for the strategy: "
