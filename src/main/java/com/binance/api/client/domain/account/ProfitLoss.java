@@ -15,6 +15,9 @@ public class ProfitLoss {
 	  private double realizedPl;
 	  
 	  private double unrealizedPl;
+	  
+	  private double unrealizedPlRatio;
+	  
 
 	  public void setSymbol(String symbol) {
 		    this.symbol = symbol;
@@ -44,7 +47,9 @@ public class ProfitLoss {
 		    this.unrealizedPl = unrealizedPl;
 		  }
 	  
-	  
+	  public void setUnrealizedPlRatio(double unrealizedPlRatio) {
+		    this.unrealizedPlRatio = unrealizedPlRatio;
+		  } 
 	  
 	  public String getSymbol() {
 		    return symbol;
@@ -72,5 +77,9 @@ public class ProfitLoss {
 	  
 	  public double getUnrealizedPl() {
 		    return unrealizedPl;
+		  }
+	  
+	  public double getUnrealizedPlRatio() {
+		    return unrealizedPlRatio;
 		  }
 }

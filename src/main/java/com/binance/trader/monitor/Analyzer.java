@@ -88,47 +88,52 @@ public class Analyzer {
 				currentQty -= qty;
 			}
 		}
-
+		
+		double marketPrice = getMarketPrice(symbol);
 		double avgPrice = currentQty == 0 ? 0 : currentCost / currentQty;
 		double unrealizedPl = currentQty == 0
 				? 0
-				: (getMarketPrice(symbol) - avgPrice) * currentQty;
+				: (marketPrice - avgPrice) * currentQty;
+		double unrealizedPlRatio = currentQty == 0 ? 0 : (marketPrice - avgPrice) / avgPrice * 100;
 		
 		pl.setSymbol(symbol);
-		pl.setMarketPrice(getMarketPrice(symbol));
+		pl.setMarketPrice(marketPrice);
 		pl.setAvgPrice(avgPrice);
-		pl.setQty(currentQty);
 		pl.setCost(currentCost);
-		pl.setUnrealizedPl(unrealizedPl);
+		pl.setQty(currentQty);
 		pl.setRealizedPl(realizedPl);
+		pl.setUnrealizedPl(unrealizedPl);
+		pl.setUnrealizedPlRatio(unrealizedPlRatio);
+
 		return pl;
 	}
 	
 	private static void printPlStatement(List<ProfitLoss> allPl , Map<String, Double> statement){
 		
 		System.out.println(LocalDateTime.now());	
-		System.out.printf("%-10s%12s%12s%12s%12s%12s%15s\n",
+		System.out.printf("%-10s%12s%12s%12s%12s%12s%15s%15s\n",
 				"Symbol",
 				"MarketPrice",
 				"AvgPrice",
 				"Cost",
-				"Qty",
+				"Quantity",
 				"RealizedPL",
-				"UnrealizedPL");
-		
-		List<Map<String, Double>> allStats = new ArrayList<>();
-		Analyzer a = new Analyzer();
+				"UnrealizedPL",
+				"UnrealizedPL%");
 
 		for (ProfitLoss pl : allPl) {
-			System.out.printf("%-10s%12.4f%12.4f%12.4f%12.4f%12.2f%15.2f\n",
+			System.out.printf("%-10s%12.4f%12.4f%12.4f%12.4f%12.2f%15.2f%14.2f%-10s\n",
 					pl.getSymbol(),
 					pl.getMarketPrice(),
 					pl.getAvgPrice(),
 					pl.getCost(),
 					pl.getQty(),
 					pl.getRealizedPl(),
-					pl.getUnrealizedPl());
+					pl.getUnrealizedPl(),
+					pl.getUnrealizedPlRatio(),
+					"%");
 		}
+		
 		System.out.println();
 		System.out.printf("Total Realized P/L: %.4f\n", statement.get("TotalRealizedProfitLoss"));
 		System.out.printf("Total Cost: %.4f\n", statement.get("TotalCost"));
