@@ -4,11 +4,13 @@ public class ProfitLoss {
 	
 	  private String symbol;
 	  
+	  private double marketPrice;
+	  
 	  private double qty;
 	  
-	  private double currentCost;
+	  private double cost;
 	  
-	  private double currentAvgPrice;
+	  private double avgPrice;
 	  
 	  private double realizedPl;
 	  
@@ -18,16 +20,20 @@ public class ProfitLoss {
 		    this.symbol = symbol;
 		  }
 	  
+	  public void setMarketPrice(double marketPrice) {
+		    this.marketPrice = marketPrice;
+		  }
+	  
 	  public void setQty(double qty) {
 		    this.qty = qty;
 		  }
 	  
-	  public void setCurrentCost(double currentCost) {
-		    this.currentCost = currentCost;
+	  public void setCost(double cost) {
+		    this.cost = cost;
 		  }
 	  
-	  public void setCurrentAvgPrice(double currentAvgPrice) {
-		    this.currentAvgPrice = currentAvgPrice;
+	  public void setAvgPrice(double avgPrice) {
+		    this.avgPrice = avgPrice;
 		  }
 	  
 	  public void setRealizedPl(double realizedPl) {
@@ -44,23 +50,27 @@ public class ProfitLoss {
 		    return symbol;
 		  }
 	  
+	  public double getMarketPrice() {
+		  	return marketPrice;
+	  }
+	  
 	  public double getQty() {
 		    return qty;
 		  }
 	  
-	  public double getCurrentCost() {
-		    return currentCost;
+	  public double getCost() {
+		    return cost;
 		  }
 	  
-	  public double getCurrentAvgPrice() {
-		    return currentAvgPrice;
+	  public double getAvgPrice() {
+		    return avgPrice;
 		  }
 	  
 	  public double getRealizedPl() {
 		    return realizedPl;
 		  }
 	  
-	  public double getUnealizedPl() {
-		    return realizedPl;
+	  public double getUnrealizedPl() {
+		    return unrealizedPl;
 		  }
 }

@@ -1,5 +1,6 @@
 package com.binance.trader.monitor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,46 +21,15 @@ public class Analyzer {
 		client = factory.newRestClient();
 	}
 
-	public static void main(String[] args) {
-
-		Analyzer a = new Analyzer();
-		String[] symbols = {"BNBBUSD", "BNBUSDT", "BTCBUSD", "BTCUSDT",
-				"ETHBUSD", "LTCBUSD", "ETCBUSD", "UNIBUSD", "DOGEBUSD",
-				"LINKBUSD", "SFPBUSD", "RSRBUSD", "ADABUSD", "COMPBUSD",
-				"AAVEBUSD", "VETBUSD", "DOTBUSD", "DATABUSD", "ATOMBUSD",
-				"NEARBUSD", "BATBUSD", "BAKEBUSD", "CREAMBUSD", "FRONTBUSD",
-				"BTTBUSD", "CAKEBUSD", "ACMBUSD", "LITBUSD", "DODOBUSD"};
-		System.out.printf("%-10s%12s%12s%12s%12s%12s%15s\n",
-				"Symbol",
-				"MarketPrice",
-				"AvgPrice",
-				"CurrentCost",
-				"CurrentQty",
-				"RealizedPL",
-				"UnrealizedPL");
-		List<Map<String, Double>> allStats = new ArrayList<>();
-		for (String symbol : symbols) {
-			List<Trade> myTrades = a.getTrades(symbol);
-			Map<String, Double> stats = a.analyze(symbol, myTrades);
-			allStats.add(stats);
-			System.out.printf("%-10s%12.4f%12.4f%12.4f%12.2f%12.2f%15.2f\n",
-					symbol,
-					stats.get("MarketPrice"),
-					stats.get("SmartAveragePrice"),
-					stats.get("CurrentCost"),
-					stats.get("CurrentQuantity"),
-					stats.get("RealizedProfitLoss"),
-					stats.get("UnrealizedProfitLoss"));
-		}
-		System.out.println();
-		System.out.printf("Total Cost: %.4f\n", allStats.stream()
-				.map(s -> s.get("CurrentCost")).reduce(0.0, Double::sum));
-		System.out.printf("Total Realized P/L: %.4f\n", allStats.stream()
-				.map(s -> s.get("RealizedProfitLoss"))
-				.reduce(0.0, Double::sum));
-		System.out.printf("Total Unrealized P/L: %.4f\n", allStats.stream()
-				.map(s -> s.get("UnrealizedProfitLoss"))
-				.reduce(0.0, Double::sum));
+	public static void main(String[] args) throws Exception {	
+		String[] symbols = {"BNBBUSD","BTCBUSD", "ETHBUSD", "ADABUSD","ETCBUSD", "UNIBUSD", "DOGEBUSD", "LINKBUSD", 
+				"COMPBUSD", "VETBUSD",	"NEARBUSD",	"BATBUSD", "BAKEBUSD", "CREAMBUSD","LTCBUSD"};
+		List<ProfitLoss> allPl = getAllPl(symbols);
+		Map<String, Double> statement = analyze(allPl);
+		while (true) {			   
+			printPlStatement(allPl, statement);
+		    Thread.sleep(900000);				
+	    }
 	}
 
 	public double getMarketPrice(String symbol) {
@@ -71,22 +41,33 @@ public class Analyzer {
 		return client.getMyTrades(symbol.toUpperCase());
 	}
 
-	public Map<String, Double> analyze(String symbol, List<Trade> trades) {
+	public static Map<String, Double> analyze(List<ProfitLoss> allPl) {
 
-		ProfitLoss pl = getPl(symbol, trades);
 		Map<String, Double> result = new HashMap<>();
-		result.put("CurrentCost", pl.getCurrentCost());
-		result.put("CurrentQuantity", pl.getQty());
-		result.put("SmartAveragePrice", pl.getCurrentAvgPrice());
-		result.put("MarketPrice", getMarketPrice(symbol));
-		result.put("RealizedProfitLoss", pl.getRealizedPl());
-		result.put("UnrealizedProfitLoss",
-				(getMarketPrice(symbol) - pl.getCurrentAvgPrice())
-						* pl.getQty());
+		result.put("TotalRealizedProfitLoss", allPl.stream()
+				.map(s -> s.getRealizedPl()).reduce(0.0, Double::sum));
+		result.put("TotalCost", allPl.stream()
+				.map(s -> s.getCost()).reduce(0.0, Double::sum));
+		result.put("TotalUnrealizedProfitLoss",allPl.stream()
+				.map(s -> s.getUnrealizedPl()).reduce(0.0, Double::sum));
+		result.put("TotalCapitalValue",result.get("TotalCost") + result.get("TotalUnrealizedProfitLoss"));
 		return result;
 	}
+	
+	public static List<ProfitLoss> getAllPl(String[] symbols ) {
+		
+		List<ProfitLoss> allPl = new ArrayList<>();
+		Analyzer a = new Analyzer();
 
-	private ProfitLoss getPl(String symbol, List<Trade> trades) {
+		for (String symbol : symbols) {
+			List<Trade> myTrades = a.getTrades(symbol);
+			ProfitLoss pl = a.getPl(symbol, myTrades);
+			allPl.add(pl);}
+		
+		return allPl;
+	}
+
+	public ProfitLoss getPl(String symbol, List<Trade> trades) {
 		ProfitLoss pl = new ProfitLoss();
 		double currentCost = 0;
 		double currentQty = 0;
@@ -108,17 +89,51 @@ public class Analyzer {
 			}
 		}
 
-		double currentAvgPrice = currentQty == 0 ? 0 : currentCost / currentQty;
+		double avgPrice = currentQty == 0 ? 0 : currentCost / currentQty;
 		double unrealizedPl = currentQty == 0
 				? 0
-				: (getMarketPrice(symbol) - currentAvgPrice) * currentQty;
-		// currentCost = currentQty == 0 ? 0 : currentCost;
-
+				: (getMarketPrice(symbol) - avgPrice) * currentQty;
+		
+		pl.setSymbol(symbol);
+		pl.setMarketPrice(getMarketPrice(symbol));
+		pl.setAvgPrice(avgPrice);
 		pl.setQty(currentQty);
-		pl.setCurrentCost(currentCost);
-		pl.setCurrentAvgPrice(currentAvgPrice);
-		pl.setRealizedPl(realizedPl);
+		pl.setCost(currentCost);
 		pl.setUnrealizedPl(unrealizedPl);
+		pl.setRealizedPl(realizedPl);
 		return pl;
+	}
+	
+	private static void printPlStatement(List<ProfitLoss> allPl , Map<String, Double> statement){
+		
+		System.out.println(LocalDateTime.now());	
+		System.out.printf("%-10s%12s%12s%12s%12s%12s%15s\n",
+				"Symbol",
+				"MarketPrice",
+				"AvgPrice",
+				"Cost",
+				"Qty",
+				"RealizedPL",
+				"UnrealizedPL");
+		
+		List<Map<String, Double>> allStats = new ArrayList<>();
+		Analyzer a = new Analyzer();
+
+		for (ProfitLoss pl : allPl) {
+			System.out.printf("%-10s%12.4f%12.4f%12.4f%12.4f%12.2f%15.2f\n",
+					pl.getSymbol(),
+					pl.getMarketPrice(),
+					pl.getAvgPrice(),
+					pl.getCost(),
+					pl.getQty(),
+					pl.getRealizedPl(),
+					pl.getUnrealizedPl());
+		}
+		System.out.println();
+		System.out.printf("Total Realized P/L: %.4f\n", statement.get("TotalRealizedProfitLoss"));
+		System.out.printf("Total Cost: %.4f\n", statement.get("TotalCost"));
+		System.out.printf("Total Unrealized P/L: %.4f\n", statement.get("TotalUnrealizedProfitLoss"));
+		System.out.printf("Total Capital Value: %.4f\n", statement.get("TotalCapitalValue"));
+		System.out.println();
 	}
 }
