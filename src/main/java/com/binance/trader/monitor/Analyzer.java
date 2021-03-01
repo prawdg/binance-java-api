@@ -16,7 +16,7 @@ public class Analyzer {
 
 	public Analyzer() {
 		BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance(
-				"<<your API key>>",
+				"<<your API key>>",		
 				"<<your secret key>>");
 		client = factory.newRestClient();
 	}
@@ -24,9 +24,10 @@ public class Analyzer {
 	public static void main(String[] args) throws Exception {	
 		String[] symbols = {"BNBBUSD","BTCBUSD", "ETHBUSD", "ADABUSD","ETCBUSD", "UNIBUSD", "DOGEBUSD", "LINKBUSD", 
 				"COMPBUSD", "VETBUSD",	"NEARBUSD",	"BATBUSD", "BAKEBUSD", "CREAMBUSD","LTCBUSD"};
-		List<ProfitLoss> allPl = getAllPl(symbols);
-		Map<String, Double> statement = analyze(allPl);
-		while (true) {			   
+
+		while (true) {		
+			List<ProfitLoss> allPl = getAllPl(symbols);
+			Map<String, Double> statement = analyze(allPl);
 			printPlStatement(allPl, statement);
 		    Thread.sleep(900000);				
 	    }
