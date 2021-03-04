@@ -10,7 +10,7 @@ import org.ta4j.core.analysis.criteria.TotalProfitCriterion;
 import org.ta4j.core.num.Num;
 
 import com.binance.api.client.domain.market.CandlestickInterval;
-import com.binance.trader.strategy.MACDStrategy;
+import com.binance.trader.strategy.MACDStrategyBuilder;
 import com.binance.trader.util.BinanceBarLoader;
 
 public class StrategyExample {
@@ -19,9 +19,9 @@ public class StrategyExample {
 
 		// Getting the bar series
 		BarSeries series = BinanceBarLoader.loadBars("COMPBUSD",
-				CandlestickInterval.HOURLY);
+				CandlestickInterval.FOUR_HORLY);
 
-		MACDStrategy macdStrategy = new MACDStrategy();
+		MACDStrategyBuilder macdStrategy = new MACDStrategyBuilder();
 
 		// Building the trading strategy
 		Strategy strategy = macdStrategy.buildStrategy(series);
@@ -30,6 +30,8 @@ public class StrategyExample {
 		BarSeriesManager seriesManager = new BarSeriesManager(series);
 		TradingRecord tradingRecord = seriesManager.run(strategy, OrderType.BUY,
 				series.numOf(1), 36, series.getEndIndex());
+
+		// Evaluating the performance
 		evaluateRecord(series, tradingRecord);
 	}
 
@@ -51,9 +53,9 @@ public class StrategyExample {
 		System.out.println("Number of trades for the strategy: "
 				+ tradingRecord.getTradeCount());
 
-		// Analysis
-		System.out.println(
-				"Total profit for the strategy: " + new TotalProfitCriterion()
-						.calculate(series, tradingRecord));
+		System.out.printf(
+				"Total profit for the strategy: %.4f%%",
+				new TotalProfitCriterion()
+						.calculate(series, tradingRecord).doubleValue());
 	}
 }

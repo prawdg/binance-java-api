@@ -14,7 +14,7 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
 /**
  * MACD strategy.
  */
-public class MACDStrategy {
+public class MACDStrategyBuilder {
 
 	/**
 	 * @param series
