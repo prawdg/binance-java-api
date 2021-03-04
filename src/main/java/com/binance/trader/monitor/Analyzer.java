@@ -9,6 +9,7 @@ import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.domain.account.ProfitLoss;
 import com.binance.api.client.domain.account.Trade;
+import com.binance.api.client.domain.market.AggTrade;
 
 public class Analyzer {
 
@@ -34,8 +35,9 @@ public class Analyzer {
 	}
 
 	public double getMarketPrice(String symbol) {
+		List<AggTrade> aggTrades = client.getAggTrades(symbol.toUpperCase());
 		return Double.parseDouble(
-				client.getAggTrades(symbol.toUpperCase()).get(0).getPrice());
+				aggTrades.get(aggTrades.size() - 1).getPrice());
 	}
 
 	public List<Trade> getTrades(String symbol) {
