@@ -11,6 +11,7 @@ import org.ta4j.core.num.Num;
 
 import com.binance.api.client.domain.market.CandlestickInterval;
 import com.binance.trader.strategy.MACDStrategyBuilder;
+import com.binance.trader.strategy.StrategyBuilder;
 import com.binance.trader.util.BinanceBarLoader;
 
 public class StrategyExample {
@@ -21,7 +22,7 @@ public class StrategyExample {
 		BarSeries series = BinanceBarLoader.loadBars("COMPBUSD",
 				CandlestickInterval.FOUR_HORLY);
 
-		MACDStrategyBuilder macdStrategy = new MACDStrategyBuilder();
+		StrategyBuilder macdStrategy = new MACDStrategyBuilder();
 
 		// Building the trading strategy
 		Strategy strategy = macdStrategy.buildStrategy(series);

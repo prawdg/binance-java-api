@@ -14,13 +14,14 @@ import org.ta4j.core.trading.rules.UnderIndicatorRule;
 /**
  * MACD strategy.
  */
-public class MACDStrategyBuilder {
+public class MACDStrategyBuilder implements StrategyBuilder {
 
 	/**
 	 * @param series
 	 *            the bar series
 	 * @return the moving momentum strategy
 	 */
+	@Override
 	public Strategy buildStrategy(BarSeries series) {
 		if (series == null) {
 			throw new IllegalArgumentException("Series cannot be null");

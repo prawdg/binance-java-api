@@ -156,7 +156,7 @@ public class BinanceApiRestClientImpl implements BinanceApiRestClient {
 
   @Override
   public List<Trade> getMyTrades(String symbol) {
-    return getMyTrades(symbol, null, null, BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis());
+    return getMyTrades(symbol, null, null, BinanceApiConstants.DEFAULT_RECEIVING_WINDOW, System.currentTimeMillis()-1000);
   }
 
   @Override
