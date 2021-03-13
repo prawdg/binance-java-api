@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.BinanceApiRestClient;
+import com.binance.api.client.domain.account.DepositHistory;
 import com.binance.api.client.domain.account.ProfitLoss;
 import com.binance.api.client.domain.account.Trade;
 import com.binance.api.client.domain.market.AggTrade;
@@ -23,14 +24,14 @@ public class Analyzer {
 	}
 
 	public static void main(String[] args) throws Exception {	
-		String[] symbols = {"BNBBUSD","BTCBUSD", "ETHBUSD", "ADABUSD","ETCBUSD", "UNIBUSD", "DOGEBUSD", "LINKBUSD", 
-				"COMPBUSD", "VETBUSD",	"NEARBUSD",	"BATBUSD", "BAKEBUSD", "CREAMBUSD","LTCBUSD"};
-
+		String[] symbols = {"BNBBUSD","BTCBUSD","ETHBUSD","ADABUSD", "UNIBUSD","LINKBUSD","CHZUSDT","CHZBUSD","DOGEBUSD","BAKEBUSD","ETCBUSD","CREAMBUSD","BATBUSD","LTCBUSD", 
+				"COMPBUSD","VETBUSD","NEARBUSD"};
+		Analyzer a = new Analyzer();
 		while (true) {		
-			List<ProfitLoss> allPl = getAllPl(symbols);
-			Map<String, Double> statement = analyze(allPl);
-			printPlStatement(allPl, statement);
-		    Thread.sleep(900000);				
+			List<ProfitLoss> allPl = a.getAllPl(symbols);
+			Map<String, Double> statement = a.analyze(allPl);
+			a.printPlStatement(allPl, statement);
+		    Thread.sleep(900000); //15 mins				
 	    }
 	}
 
@@ -43,8 +44,12 @@ public class Analyzer {
 	public List<Trade> getTrades(String symbol) {
 		return client.getMyTrades(symbol.toUpperCase());
 	}
+	
+	public DepositHistory getDepositHistory(String asset) {
+		return client.getDepositHistory(asset.toUpperCase());
+	}
 
-	public static Map<String, Double> analyze(List<ProfitLoss> allPl) {
+	public  Map<String, Double> analyze(List<ProfitLoss> allPl) {
 
 		Map<String, Double> result = new HashMap<>();
 		result.put("TotalRealizedProfitLoss", allPl.stream()
@@ -57,14 +62,13 @@ public class Analyzer {
 		return result;
 	}
 	
-	public static List<ProfitLoss> getAllPl(String[] symbols ) {
+	public List<ProfitLoss> getAllPl(String[] symbols ) {
 		
 		List<ProfitLoss> allPl = new ArrayList<>();
-		Analyzer a = new Analyzer();
 
 		for (String symbol : symbols) {
-			List<Trade> myTrades = a.getTrades(symbol);
-			ProfitLoss pl = a.getPl(symbol, myTrades);
+			List<Trade> myTrades = getTrades(symbol);
+			ProfitLoss pl = getPl(symbol, myTrades);
 			allPl.add(pl);}
 		
 		return allPl;
@@ -85,10 +89,16 @@ public class Analyzer {
 				double tmpAvgPrice = currentQty == 0
 						? 0
 						: currentCost / currentQty;
-				currentCost -= tmpAvgPrice * qty;
-				realizedPl += (Double.parseDouble(trade.getPrice())
-						- tmpAvgPrice) * qty;
-				currentQty -= qty;
+				if (currentQty < qty) {				
+					realizedPl += Double.parseDouble(trade.getPrice()) * qty - currentCost;
+					currentCost = 0;
+					currentQty = 0;
+				} else {
+					currentCost -= tmpAvgPrice * qty;
+					realizedPl += (Double.parseDouble(trade.getPrice())
+							- tmpAvgPrice) * qty;
+					currentQty -= qty;
+				}
 			}
 		}
 		
@@ -111,7 +121,7 @@ public class Analyzer {
 		return pl;
 	}
 	
-	private static void printPlStatement(List<ProfitLoss> allPl , Map<String, Double> statement){
+	private void printPlStatement(List<ProfitLoss> allPl , Map<String, Double> statement){
 		
 		System.out.println(LocalDateTime.now());	
 		System.out.printf("%-10s%12s%12s%12s%12s%12s%15s%15s\n",
