@@ -106,9 +106,9 @@ public class Analyzer {
 				"Quantity", "RealizedPL", "UnrealizedPL", "UnrealizedPL%");
 
 		for (ProfitLoss pl : allPl) {
-			System.out.printf("%-10s%12.4f%12.4f%12.4f%12.4f%12.2f%15.2f%14.2f%-10s\n", pl.getSymbol(),
+			System.out.printf("%-10s%12.4f%12.4f%12.4f%12.4f%12.2f%15.2f%14.2f%%\n", pl.getSymbol(),
 					pl.getMarketPrice(), pl.getAvgPrice(), pl.getCost(), pl.getQty(), pl.getRealizedPl(),
-					pl.getUnrealizedPl(), pl.getUnrealizedPlRatio(), "%");
+					pl.getUnrealizedPl(), pl.getUnrealizedPlRatio());
 		}
 
 		System.out.println();
