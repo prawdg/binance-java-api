@@ -24,4 +24,7 @@ public class ProfitLoss {
 	private double unrealizedPl;
 
 	private double unrealizedPlRatio;
+	
+	private double platformCommission;
+	
 }

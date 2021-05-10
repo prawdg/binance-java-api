@@ -99,3 +99,4 @@ target/
 .classpath
 .project
 .settings/
+/.apt_generated/

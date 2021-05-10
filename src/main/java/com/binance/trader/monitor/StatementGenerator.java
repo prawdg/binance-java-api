@@ -81,7 +81,8 @@ public class StatementGenerator {
 		System.out.println();
 		System.out.printf("Total Realized P/L: %.4f\n",
 				statement.get("TotalRealizedProfitLoss"));
-		System.out.printf("Total Cost: %.4f\n", statement.get("TotalCost"));
+		System.out.printf("Total Cost: %.4f\n", 
+				statement.get("TotalCost"));
 		System.out.printf("Total Unrealized P/L: %.4f\n",
 				statement.get("TotalUnrealizedProfitLoss"));
 		System.out.printf("Total Capital Value: %.4f\n",
