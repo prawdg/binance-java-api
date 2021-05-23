@@ -191,7 +191,7 @@ public class Analyzer {
 		if (totalCommission > 0 && bnbPLOp.isPresent()) {
 			ProfitLoss bnbPL = bnbPLOp.get();
 			bnbPL.setQty(bnbPL.getQty() - totalCommission);
-			bnbPL.setUnrealizedPl((bnbPL.getMarketPrice() - bnbPL.getPlatformCommission()) * bnbPL.getQty());
+			bnbPL.setUnrealizedPl((bnbPL.getMarketPrice() - bnbPL.getAvgPrice()) * bnbPL.getQty());
 			bnbPL.setUnrealizedPlRatio(bnbPL.getUnrealizedPl() / bnbPL.getCost() * 100);
 		}
 	}
